@@ -1,0 +1,77 @@
+{
+	"name": "HW IF activitity",
+	"properties": {
+		"description": "If the total units <= 200 (slab) then total_units * 3\nelse\n till 200 units (total_units * 3) + ((total units -slab) * 5)",
+		"activities": [
+			{
+				"name": "If Condition1",
+				"type": "IfCondition",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@lessOrEquals(variables('Total Units'), variables('slab'))",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "set variable",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Power Bill",
+								"value": {
+									"value": "@add(mul(variables('slab'),3 ), mul(sub(variables('Total Units'),variables('slab') ), 5 ))",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "set power bill",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Power Bill",
+								"value": {
+									"value": "@mul(variables('Total Units'), 3)",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"Power Bill": {
+				"type": "Integer"
+			},
+			"Total Units": {
+				"type": "Integer",
+				"defaultValue": 210
+			},
+			"slab": {
+				"type": "Integer",
+				"defaultValue": 200
+			}
+		},
+		"folder": {
+			"name": "scenarios"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-04-20T07:38:00Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,77 @@
+{
+	"name": "16 If activity example",
+	"properties": {
+		"description": "take variable length and breadth. If length <=10 the price = (length *breadth) * 100,\nelse price =(length *breadth) * 50",
+		"activities": [
+			{
+				"name": "If Condition1",
+				"type": "IfCondition",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@lessOrEquals(variables('length'), 10)",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Set variable1",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "price",
+								"value": {
+									"value": "@mul(mul(variables('breadth'),variables('length') ),50 )",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Set price",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "price",
+								"value": {
+									"value": "@mul(mul(variables('breadth'),variables('length') ),100 )",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"length": {
+				"type": "Integer",
+				"defaultValue": 11
+			},
+			"breadth": {
+				"type": "Integer",
+				"defaultValue": 5
+			},
+			"price": {
+				"type": "Integer"
+			}
+		},
+		"folder": {
+			"name": "Proj1"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-04-20T07:38:00Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

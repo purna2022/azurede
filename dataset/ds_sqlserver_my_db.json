@@ -1,0 +1,17 @@
+{
+	"name": "ds_sqlserver_my_db",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_my_sql_server_demo",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "1",
+			"table": "2"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,136 @@
+{
+	"name": "9 Parameters at Datasets Level dynamic",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_my_demo_db_all_tabs",
+						"type": "DatasetReference",
+						"parameters": {
+							"schema": "saleslt",
+							"table": "customer"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_projblobstorage1_tab_2_csv_dyn",
+						"type": "DatasetReference",
+						"parameters": {
+							"schema": "saleslt",
+							"table": "customer"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy data2",
+				"description": "Copy emp tab data from database to blob storage dynamically. ",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_my_demo_db_all_tabs",
+						"type": "DatasetReference",
+						"parameters": {
+							"schema": "dbo",
+							"table": "emp"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_projblobstorage1_tab_2_csv_dyn",
+						"type": "DatasetReference",
+						"parameters": {
+							"schema": "dbo",
+							"table": "emp"
+						}
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "Proj1"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-04-17T17:16:44Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,117 @@
+{
+	"name": "Sol 1 Copy table from DB to Blob Storage in Parquet form in nested dynamic folder",
+	"properties": {
+		"description": "Copy table from DB to Storage in Parquet form in a nested dynamic folder like  year month day. \nEx: Container_name/ 2024/04/21/Shema_name.filename.parquet",
+		"activities": [
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('TableList')",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_sqlserver_db_tabs",
+									"type": "DatasetReference",
+									"parameters": {
+										"Schema": {
+											"value": "@item().schema",
+											"type": "Expression"
+										},
+										"Tablename": {
+											"value": "@item().Tablename",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_blobstorage_table_migration",
+									"type": "DatasetReference",
+									"parameters": {
+										"schema": {
+											"value": "@item().schema",
+											"type": "Expression"
+										},
+										"filname": {
+											"value": "@item().Tablename",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"TableList": {
+				"type": "Array",
+				"defaultValue": [
+					{
+						"schema": "SalesLT",
+						"Tablename": "Address"
+					},
+					{
+						"schema": "SalesLT",
+						"Tablename": "Customer"
+					},
+					{
+						"schema": "SalesLT",
+						"Tablename": "Product"
+					}
+				]
+			}
+		},
+		"folder": {
+			"name": "scenarios"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-04-21T21:06:40Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

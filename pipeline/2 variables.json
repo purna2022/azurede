@@ -1,0 +1,83 @@
+{
+	"name": "2 variables",
+	"properties": {
+		"activities": [
+			{
+				"name": "Length",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Length",
+					"value": 10
+				}
+			},
+			{
+				"name": "Breadth",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Breadth",
+					"value": 5
+				}
+			},
+			{
+				"name": "Area",
+				"description": "Area of a rectangle",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Length",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "Breadth",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Area",
+					"value": {
+						"value": "@mul(variables('Breadth'),variables('Length'))",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"Length": {
+				"type": "Integer"
+			},
+			"Breadth": {
+				"type": "Integer"
+			},
+			"Area": {
+				"type": "Integer"
+			}
+		},
+		"folder": {
+			"name": "Proj1"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-04-16T18:54:22Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

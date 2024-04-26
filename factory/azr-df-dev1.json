@@ -1,0 +1,9 @@
+{
+	"name": "azr-df-dev1",
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "33fc48e5-fd53-4612-bfc4-382034b69b77",
+		"tenantId": "8156fed9-8b50-4a2a-9aaf-04690053933b"
+	}
+}

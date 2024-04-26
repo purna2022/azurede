@@ -1,0 +1,165 @@
+{
+	"name": "3 HW formula_copy1",
+	"properties": {
+		"activities": [
+			{
+				"name": "A",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "A",
+					"value": 10
+				}
+			},
+			{
+				"name": "B",
+				"description": "Value of B",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "B",
+					"value": 5
+				}
+			},
+			{
+				"name": "C",
+				"description": "10",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "C",
+					"value": 10
+				}
+			},
+			{
+				"name": "A - B",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "A",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "B",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": " A - B",
+					"value": {
+						"value": "@sub(variables('A'),variables('B'))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Result",
+				"description": "(A- B + C)",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "C",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "A - B",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "A - B + C",
+					"value": {
+						"value": "@add(variables(' A - B'), variables('C'))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "final result",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Result",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "B",
+					"value": {
+						"value": "@mul(variables('A - B + C'),variables('A - B + C'))",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"A": {
+				"type": "Integer",
+				"defaultValue": 10
+			},
+			"B": {
+				"type": "Integer",
+				"defaultValue": 5
+			},
+			"C": {
+				"type": "Integer",
+				"defaultValue": 10
+			},
+			" A - B": {
+				"type": "Integer"
+			},
+			"A - B + C": {
+				"type": "Integer"
+			},
+			"Result": {
+				"type": "Integer"
+			}
+		},
+		"folder": {
+			"name": "Proj1"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-04-21T15:33:30Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

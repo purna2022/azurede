@@ -1,0 +1,112 @@
+{
+	"name": "3 HW formula",
+	"properties": {
+		"activities": [
+			{
+				"name": "A",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "A",
+					"value": 10
+				}
+			},
+			{
+				"name": "B",
+				"description": "Value of B",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "B",
+					"value": 10
+				}
+			},
+			{
+				"name": "Result",
+				"description": "(A + B)",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "A",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "B",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Result (A+B)",
+					"value": {
+						"value": "@add(variables('A'),variables('B'))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Final Result",
+				"description": "(A + B)^2",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Result",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "(A+B) * (A+B)",
+					"value": {
+						"value": "@mul(variables('Result (A+B)'), variables('Result (A+B)'))",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"A": {
+				"type": "Integer"
+			},
+			"B": {
+				"type": "Integer"
+			},
+			"Result (A+B)": {
+				"type": "Integer"
+			},
+			"(A+B) * (A+B)": {
+				"type": "Integer"
+			}
+		},
+		"folder": {
+			"name": "Proj1"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-04-18T14:59:04Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

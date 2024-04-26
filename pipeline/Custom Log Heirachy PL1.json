@@ -1,0 +1,177 @@
+{
+	"name": "Custom Log Heirachy PL1",
+	"properties": {
+		"activities": [
+			{
+				"name": "Log Start PL1",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderStoredProcedureName": "[Log].[captureADFPipelineLogsStartHeirachy]",
+						"storedProcedureParameters": {
+							"p_adfname": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().DataFactory",
+									"type": "Expression"
+								}
+							},
+							"p_parent_id": {
+								"type": "Int32",
+								"value": null
+							},
+							"p_piplinename": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().Pipeline",
+									"type": "Expression"
+								}
+							},
+							"p_runid": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().RunId",
+									"type": "Expression"
+								}
+							},
+							"p_runstart": {
+								"type": "DateTime",
+								"value": {
+									"value": "@utcnow()",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_SqlServerTable2",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Wait PL1",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "Log Start PL1",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 10
+				}
+			},
+			{
+				"name": "Execute PL2",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Wait PL1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Custom Log Heirachy PL2",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Parent_ID": {
+							"value": "@activity('Log Start PL1').output.firstRow.ID",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Stored procedure1",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Execute PL2",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[Log].[captureADFPipelineLogsEndHeirachy]",
+					"storedProcedureParameters": {
+						"p_errormessage": {
+							"value": null,
+							"type": "String"
+						},
+						"p_id": {
+							"value": {
+								"value": "@activity('Log Start PL1').output.firstRow.ID",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"p_runend": {
+							"value": {
+								"value": "@utcnow()",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"p_status": {
+							"value": {
+								"value": "@variables('SuccessStatus')",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_my_sql_server_demo",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"variables": {
+			"SuccessStatus": {
+				"type": "String",
+				"defaultValue": "Success"
+			}
+		},
+		"folder": {
+			"name": "scenarios"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-04-24T18:35:25Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

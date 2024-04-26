@@ -1,0 +1,127 @@
+{
+	"name": "Sol 2 cpy table from onprems db to cloud db staging with limited columns",
+	"properties": {
+		"description": "Sol 2 cpy table from onprems db to cloud db staging with limited columns",
+		"activities": [
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('TableList')",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderQuery": {
+										"value": "@concat('SELECT ', item().src_column_list, ' FROM ', item().src_schema, '.', item().src_Tablename)",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "SqlServerSink",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false,
+									"tableOption": "autoCreate"
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_onprems_db1",
+									"type": "DatasetReference",
+									"parameters": {
+										"schema": {
+											"value": "@item().src_schema",
+											"type": "Expression"
+										},
+										"tablename": {
+											"value": "@item().src_Tablename",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_azr_sql_server_db",
+									"type": "DatasetReference",
+									"parameters": {
+										"schema": {
+											"value": "@item().dest_schema",
+											"type": "Expression"
+										},
+										"table": {
+											"value": "@item().dest_table",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"TableList": {
+				"type": "Array",
+				"defaultValue": [
+					{
+						"src_schema": "dbo",
+						"src_Tablename": "category",
+						"src_column_list": "category_id, category_name, amount",
+						"dest_schema": "stg1",
+						"dest_table": "category"
+					},
+					{
+						"src_schema": "dbo",
+						"src_Tablename": "Orders",
+						"src_column_list": "OrderID, OrderDate",
+						"dest_schema": "stg1",
+						"dest_table": "Orders"
+					},
+					{
+						"src_schema": "dbo",
+						"src_Tablename": "EMP",
+						"src_column_list": "empno, ename, sal, job, deptno",
+						"dest_schema": "stg1",
+						"dest_table": "EMP"
+					}
+				]
+			}
+		},
+		"folder": {
+			"name": "OnpremsDB"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-04-26T20:03:00Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

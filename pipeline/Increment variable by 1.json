@@ -1,0 +1,64 @@
+{
+	"name": "Increment variable by 1",
+	"properties": {
+		"description": "length = length +1",
+		"activities": [
+			{
+				"name": "Set Temp",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "temp",
+					"value": {
+						"value": "@variables('length')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Increment Length",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set Temp",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "length",
+					"value": {
+						"value": "@add(variables('temp'),1)",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"length": {
+				"type": "Integer",
+				"defaultValue": 10
+			},
+			"temp": {
+				"type": "Integer"
+			}
+		},
+		"folder": {
+			"name": "scenarios"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-04-19T19:16:21Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

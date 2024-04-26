@@ -1,0 +1,46 @@
+{
+	"name": "14 Filter activity",
+	"properties": {
+		"description": "Take an array [10, 20, 30, 40, 50, 60] and filter the filter the elemnts which is greater than 30",
+		"activities": [
+			{
+				"name": "Filter1",
+				"type": "Filter",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('Num_List')",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@greater(item(), 30)",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"Num_List": {
+				"type": "Array",
+				"defaultValue": [
+					10,
+					20,
+					30,
+					40,
+					50,
+					60
+				]
+			},
+			"Temp": {
+				"type": "Array"
+			}
+		},
+		"folder": {
+			"name": "Proj1"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-04-20T05:46:08Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

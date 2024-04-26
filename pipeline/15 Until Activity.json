@@ -1,0 +1,79 @@
+{
+	"name": "15 Until Activity",
+	"properties": {
+		"description": "Take a variable Batch_job =1 increment until the batch_job value is 5",
+		"activities": [
+			{
+				"name": "Until1",
+				"type": "Until",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greater(variables('batch_job'), 5)",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Set temp variable",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "temp",
+								"value": {
+									"value": "@variables('batch_job')",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Increment batch job by 1",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set temp variable",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "batch_job",
+								"value": {
+									"value": "@add(variables('temp'), 1)",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"timeout": "0.12:00:00"
+				}
+			}
+		],
+		"variables": {
+			"batch_job": {
+				"type": "Integer",
+				"defaultValue": 1
+			},
+			"temp": {
+				"type": "Integer"
+			}
+		},
+		"folder": {
+			"name": "Proj1"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-04-20T06:06:22Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

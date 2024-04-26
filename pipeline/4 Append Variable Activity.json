@@ -1,0 +1,62 @@
+{
+	"name": "4 Append Variable Activity",
+	"properties": {
+		"activities": [
+			{
+				"name": "Marks Array",
+				"description": "It will add 90 to the \"Append Activities\"",
+				"type": "AppendVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "marks",
+					"value": "90"
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Marks Array",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "temp",
+					"value": {
+						"value": "@variables('marks')",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"marks": {
+				"type": "Array",
+				"defaultValue": [
+					10,
+					20,
+					30,
+					40
+				]
+			},
+			"temp": {
+				"type": "Array"
+			}
+		},
+		"folder": {
+			"name": "Proj1"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-04-18T18:04:25Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

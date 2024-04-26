@@ -1,0 +1,97 @@
+{
+	"name": "10 parameters using variables",
+	"properties": {
+		"description": "Dynamically passing parameters from the pipeline using variables to copy tables from src to dest as csv file ",
+		"activities": [
+			{
+				"name": "Copy data2",
+				"description": "Copy emp tab data from database to blob storage dynamically. ",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_my_demo_db_all_tabs",
+						"type": "DatasetReference",
+						"parameters": {
+							"schema": {
+								"value": "@variables('schema')",
+								"type": "Expression"
+							},
+							"table": {
+								"value": "@variables('table')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_projblobstorage1_tab_2_csv_dyn",
+						"type": "DatasetReference",
+						"parameters": {
+							"schema": {
+								"value": "@variables('schema')",
+								"type": "Expression"
+							},
+							"table": {
+								"value": "@variables('table')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"variables": {
+			"schema": {
+				"type": "String",
+				"defaultValue": "dbo"
+			},
+			"table": {
+				"type": "String",
+				"defaultValue": "dept"
+			}
+		},
+		"folder": {
+			"name": "Proj1"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-04-17T17:16:44Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,125 @@
+{
+	"name": "7 json activities",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get Metadata1",
+				"description": "Get Metadata of all the files present in bolb",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_projblobstorage1_cont_src_all",
+						"type": "DatasetReference"
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobStorageReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			},
+			{
+				"name": "Single Value from Metadata",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Metadata1",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "single_value",
+					"value": {
+						"value": "@activity('Get Metadata1').output.childItems[0].name",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Array from Metadata",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Metadata1",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Array_val",
+					"value": {
+						"value": "@activity('Get Metadata1').output.childItems",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Single Value from Array",
+				"description": "Single Value from Array",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Array from Metadata",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "single_value",
+					"value": {
+						"value": "@activity('Get Metadata1').output.childItems[0].name",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"single_value": {
+				"type": "String"
+			},
+			"Array_val": {
+				"type": "Array"
+			}
+		},
+		"folder": {
+			"name": "Proj1"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-04-18T17:35:06Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

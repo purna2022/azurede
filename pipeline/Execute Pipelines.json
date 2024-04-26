@@ -1,0 +1,35 @@
+{
+	"name": "Execute Pipelines",
+	"properties": {
+		"description": "It will execute other pipeline",
+		"activities": [
+			{
+				"name": "Execute Pipeline1",
+				"description": "It will execute other pipelines by passing parameters",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "12 parameters in pipeline calls other pipelines",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"schema": "saleslt",
+						"table": "product"
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "Proj1"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-04-17T17:41:55Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,116 @@
+{
+	"name": "3 HW formula_copy2",
+	"properties": {
+		"activities": [
+			{
+				"name": "A",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "A",
+					"value": 10
+				}
+			},
+			{
+				"name": "B",
+				"description": "Value of B",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "B",
+					"value": 5
+				}
+			},
+			{
+				"name": "C",
+				"description": "Value of B",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "C",
+					"value": 5
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "A",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "B",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "C",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Result",
+					"value": {
+						"value": "@mul(add(sub(variables('A'), variables('B')), variables('C')), add(sub(variables('A'), variables('B')), variables('C')))\n\n\n\n",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"A": {
+				"type": "Integer",
+				"defaultValue": 10
+			},
+			"B": {
+				"type": "Integer",
+				"defaultValue": 5
+			},
+			"C": {
+				"type": "Integer",
+				"defaultValue": 10
+			},
+			" A - B": {
+				"type": "Integer"
+			},
+			"A - B + C": {
+				"type": "Integer"
+			},
+			"Result": {
+				"type": "Integer"
+			}
+		},
+		"folder": {
+			"name": "Proj1"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-04-21T16:20:31Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
