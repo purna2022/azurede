@@ -68,7 +68,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "log_status",
-					"value": "success"
+					"value": {
+						"value": "@activity('Lookup1').output.firstRow",
+						"type": "Expression"
+					}
 				}
 			},
 			{
