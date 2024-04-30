@@ -1,0 +1,9 @@
+{
+	"name": "ADF pipeline heirachy Log capture",
+	"properties": {
+		"folder": {
+			"name": "ADF PIPELINE LOGS"
+		},
+		"annotations": []
+	}
+}
