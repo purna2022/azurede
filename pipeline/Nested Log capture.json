@@ -1,0 +1,216 @@
+{
+	"name": "Nested Log capture",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderStoredProcedureName": "[dbo].[usp_pipline_start_log_nested]",
+						"storedProcedureParameters": {
+							"p_parent_id": {
+								"type": "Int32",
+								"value": null
+							},
+							"p_pipline_name": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().Pipeline",
+									"type": "Expression"
+								}
+							},
+							"p_runid": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().RunId",
+									"type": "Expression"
+								}
+							},
+							"p_status": {
+								"type": "String",
+								"value": {
+									"value": "@variables('Initial_status')",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_sqlserver_my_db",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Execute Pipeline1",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Wait1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Nested Log capture PL1",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"parent_id": {
+							"value": "@activity('Lookup1').output.firstRow.id",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Stored procedure1",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Execute Pipeline1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[Log].[update_pipeline_log_nested]",
+					"storedProcedureParameters": {
+						"p_error_msg": {
+							"value": null,
+							"type": "String"
+						},
+						"p_id": {
+							"value": {
+								"value": "@activity('Lookup1').output.firstRow.id",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"p_status": {
+							"value": {
+								"value": "@variables('succes_status')",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_my_sql_server_demo",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Stored procedure1_copy1",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Execute Pipeline1",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[Log].[update_pipeline_log_nested]",
+					"storedProcedureParameters": {
+						"p_error_msg": {
+							"value": {
+								"value": "@activity('Execute Pipeline1').error.message",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"p_id": {
+							"value": null,
+							"type": "Int32"
+						},
+						"p_status": {
+							"value": {
+								"value": "@variables('failure_status')",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_my_sql_server_demo",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Wait1",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 1
+				}
+			}
+		],
+		"variables": {
+			"initial_status": {
+				"type": "String",
+				"defaultValue": "running"
+			},
+			"succes_status": {
+				"type": "String",
+				"defaultValue": "success"
+			},
+			"failure_status": {
+				"type": "String",
+				"defaultValue": "fail"
+			}
+		},
+		"folder": {
+			"name": "ADF PIPELINE LOGS"
+		},
+		"annotations": []
+	}
+}
