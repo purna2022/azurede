@@ -1,5 +1,5 @@
 {
-	"name": "Direct table transfer from DB to DB",
+	"name": "1-Direct table transfer from DB to DB as it is",
 	"properties": {
 		"description": "This process will create the table in the destination DB and copy the data to destination DB.",
 		"activities": [
