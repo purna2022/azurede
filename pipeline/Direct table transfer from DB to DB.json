@@ -1,0 +1,118 @@
+{
+	"name": "Direct table transfer from DB to DB",
+	"properties": {
+		"description": "This process will create the table in the destination DB and copy the data to destination DB.",
+		"activities": [
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('Table_list')",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "SqlServerSink",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false,
+									"tableOption": "autoCreate"
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "SqlServerTable4",
+									"type": "DatasetReference",
+									"parameters": {
+										"schema": {
+											"value": "@item().src_schema",
+											"type": "Expression"
+										},
+										"table": {
+											"value": "@item().src_Tablename",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "SqlServerTable5",
+									"type": "DatasetReference",
+									"parameters": {
+										"schema": {
+											"value": "@item().dest_schema",
+											"type": "Expression"
+										},
+										"table": {
+											"value": "@item().dest_table",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"Table_list": {
+				"type": "Array",
+				"defaultValue": [
+					{
+						"src_schema": "dbo",
+						"src_Tablename": "DEPT",
+						"dest_schema": "stg2",
+						"dest_table": "DEPT"
+					},
+					{
+						"src_schema": "dbo",
+						"src_Tablename": "SALGRADE",
+						"dest_schema": "stg2",
+						"dest_table": "SALGRADE"
+					},
+					{
+						"src_schema": "dbo",
+						"src_Tablename": "EMP",
+						"dest_schema": "stg2",
+						"dest_table": "EMP"
+					}
+				]
+			}
+		},
+		"folder": {
+			"name": "DB-DB-Table-Transfer"
+		},
+		"annotations": []
+	}
+}
