@@ -1,5 +1,5 @@
 {
-	"name": "DB to DB tabel transfer based on src columns using query option",
+	"name": "2-DB to DB tabel transfer based on src columns using query option",
 	"properties": {
 		"activities": [
 			{
