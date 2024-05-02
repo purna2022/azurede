@@ -1,0 +1,199 @@
+{
+	"name": "ADF pipeline Log capture",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderStoredProcedureName": "[dbo].[usp_pipline_start_log]",
+						"storedProcedureParameters": {
+							"p_pipline_name": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().Pipeline",
+									"type": "Expression"
+								}
+							},
+							"p_runid": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().RunId",
+									"type": "Expression"
+								}
+							},
+							"p_status": {
+								"type": "String",
+								"value": {
+									"value": "@variables('log_status')",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_sqlserver_my_db",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Wait1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "log_status",
+					"value": {
+						"value": "@activity('Lookup1').output.firstRow",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "success log",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[Log].[update_pipeline_log]",
+					"storedProcedureParameters": {
+						"p_id": {
+							"value": {
+								"value": "@activity('Lookup1').output.firstRow.id",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"p_status": {
+							"value": {
+								"value": "@variables('success_status')",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_my_sql_server_demo",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "failure log",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[Log].[update_pipeline_log]",
+					"storedProcedureParameters": {
+						"p_id": {
+							"value": {
+								"value": "@activity('Lookup1').output.firstRow.id",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"p_status": {
+							"value": {
+								"value": "@variables('fail_status')",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_my_sql_server_demo",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Wait1",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 10
+				}
+			}
+		],
+		"variables": {
+			"log_status": {
+				"type": "String",
+				"defaultValue": "running"
+			},
+			"success_status": {
+				"type": "String",
+				"defaultValue": "success"
+			},
+			"fail_status": {
+				"type": "String",
+				"defaultValue": "fail"
+			}
+		},
+		"folder": {
+			"name": "ADF PIPELINE LOGS"
+		},
+		"annotations": []
+	}
+}
