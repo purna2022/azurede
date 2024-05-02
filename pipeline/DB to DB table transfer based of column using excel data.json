@@ -1,0 +1,9 @@
+{
+	"name": "DB to DB table transfer based of column using excel data",
+	"properties": {
+		"folder": {
+			"name": "DB-DB-Table-Transfer"
+		},
+		"annotations": []
+	}
+}
