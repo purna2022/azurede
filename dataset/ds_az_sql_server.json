@@ -1,0 +1,12 @@
+{
+	"name": "ds_az_sql_server",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_my_sql_server_demo",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": []
+	}
+}

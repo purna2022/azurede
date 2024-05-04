@@ -1,0 +1,35 @@
+{
+	"name": "ds_blobstg_rawdata",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_blob_projblobstorage1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"tabname": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@concat(dataset().tabname,'.csv')",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@concat(substring(utcnow(), 0,4 ), '/', substring(utcnow(), 5,2 ),'/',substring(utcnow(), 8,2 ))",
+					"type": "Expression"
+				},
+				"container": "rawdata"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}

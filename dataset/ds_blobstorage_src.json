@@ -1,0 +1,36 @@
+{
+	"name": "ds_blobstorage_src",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_blob_projblobstorage1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"file_name": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().file_name",
+					"type": "Expression"
+				},
+				"container": "source"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": ";product1:text1;area1",
+				"type": "String"
+			}
+		]
+	}
+}
