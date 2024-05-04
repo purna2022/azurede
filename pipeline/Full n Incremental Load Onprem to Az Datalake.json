@@ -5,22 +5,329 @@
 			{
 				"name": "Full Load",
 				"type": "ForEach",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
 						"value": "@variables('FullLoadTabList')",
 						"type": "Expression"
-					}
+					},
+					"activities": [
+						{
+							"name": "Full Load from Onprem to DLS",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_onprem_master_param",
+									"type": "DatasetReference",
+									"parameters": {
+										"schema": {
+											"value": "@item().schema",
+											"type": "Expression"
+										},
+										"table": {
+											"value": "@item().tablename",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_blobstg_rawdata",
+									"type": "DatasetReference",
+									"parameters": {
+										"tabname": {
+											"value": "@item().filename",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "Incremental Load",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('IncLoadTabList')",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Get max Watermark date",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderQuery": {
+										"value": "@concat('select watermarkDateTime \nfrom watermarktable \nwhere tablename = ''', item().tablename,'''')",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_az_sql_server",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "Get max modified Date from Onprems tabs",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderQuery": {
+										"value": "@concat('select max(ModifiedDate) as maxdate\nfrom ',item().schema,'.', item().tablename)",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_onprem_master",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Get max Watermark date",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								},
+								{
+									"activity": "Get max modified Date from Onprems tabs",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderQuery": {
+										"value": "@concat('select * from ',item().schema,'.', item().tablename,\n'where ModifiedDate > ''',activity('Get max Watermark date').output.firstRow.watermarkDateTime,'''','and ModifiedDate <= ''',activity('Get max modified Date from Onprems tabs').output.firstRow.maxdate,'''')",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_onprem_master",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_blobstg_rawdata",
+									"type": "DatasetReference",
+									"parameters": {
+										"tabname": {
+											"value": "@item().filename",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Update the watermark table",
+							"type": "Script",
+							"dependsOn": [
+								{
+									"activity": "Copy data1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "ls_AzureSqlDatabase",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "@concat('Update dbo.watermarktable set watermarkDateTime = ''',activity('Get max modified Date from Onprems tabs').output.firstRow.maxdate,'''WHERE tablename =''',item().tablename,'''')",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						}
+					]
 				}
 			}
 		],
 		"variables": {
 			"FullLoadTabList": {
-				"type": "Array"
+				"type": "Array",
+				"defaultValue": [
+					{
+						"schema": "dbo",
+						"tablename": "Customers",
+						"filename": "Customers"
+					},
+					{
+						"schema": "dbo",
+						"tablename": "Products",
+						"filename": "Products"
+					},
+					{
+						"schema": "dbo",
+						"tablename": "Reviews",
+						"filename": "Reviews"
+					},
+					{
+						"schema": "dbo",
+						"tablename": "Promotions",
+						"filename": "Promotions"
+					},
+					{
+						"schema": "dbo",
+						"tablename": "ShippingDetails",
+						"filename": "ShippingDetails"
+					},
+					{
+						"schema": "dbo",
+						"tablename": "Returns",
+						"filename": "Returns"
+					}
+				]
 			},
 			"IncLoadTabList": {
-				"type": "Array"
+				"type": "Array",
+				"defaultValue": [
+					{
+						"schema": "dbo",
+						"tablename": "Orders",
+						"filename": "Orders"
+					},
+					{
+						"schema": "dbo",
+						"tablename": "OrderItems",
+						"filename": "OrderItems"
+					},
+					{
+						"schema": "dbo",
+						"tablename": "Inventory",
+						"filename": "Inventory"
+					},
+					{
+						"schema": "dbo",
+						"tablename": "Payments",
+						"filename": "Payments"
+					}
+				]
 			}
 		},
 		"folder": {
