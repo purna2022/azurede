@@ -5,9 +5,9 @@
 		"annotations": [],
 		"type": "SqlServer",
 		"typeProperties": {
-			"connectionString": "integrated security=True;data source=localhost;initial catalog=Practice",
+			"connectionString": "integrated security=True;data source=localhost;initial catalog=master",
 			"userName": "Priyadarshini",
-			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiIxZDgzNDAxZS0zYmE5LTRmMDktYjQxMS1mNGRlMGZjYzdkNDkiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI4ZmU2MzlkMi05ZTBjLTRkODQtYWFiMC03MDdlZTc4OTc1ZmMiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
 		},
 		"connectVia": {
 			"referenceName": "IRforOnPrems1",
